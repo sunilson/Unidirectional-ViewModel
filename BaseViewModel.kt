@@ -19,7 +19,7 @@ import kotlinx.coroutines.selects.select
 private typealias GetState<State> = suspend (State) -> Unit
 private typealias SetState<State> = suspend State.() -> State
 
-abstract class BaseViewModel2<State, Event>(initialState: State) : ViewModel() {
+abstract class BaseViewModel<State, Event>(initialState: State) : ViewModel() {
 
     /**
      * The state of this ViewModel. Observe to get changes or use [getState] to get a snapshot (don't use [LiveData.getValue])
