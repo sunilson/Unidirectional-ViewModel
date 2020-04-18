@@ -16,6 +16,9 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
 
+private typealias GetState<State> = suspend (State) -> Unit
+private typealias SetState<State> = suspend State.() -> State
+
 abstract class BaseViewModel2<State, Event>(initialState: State) : ViewModel() {
 
     /**
