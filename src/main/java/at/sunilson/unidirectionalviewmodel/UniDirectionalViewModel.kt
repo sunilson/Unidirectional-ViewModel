@@ -1,4 +1,4 @@
-package io.iconicfinance.iconicfinance.presentationcore.base
+package at.sunilson.unidirectionalviewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,10 +16,11 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
 
-private typealias GetState<State> = suspend (State) -> Unit
-private typealias SetState<State> = suspend State.() -> State
+internal typealias GetState<State> = (State) -> Unit
+internal typealias SetState<State> = State.() -> State
+internal typealias MiddleWare<State> = (State) -> Unit
 
-abstract class BaseViewModel<State, Event>(initialState: State) : ViewModel() {
+abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) : ViewModel() {
 
     /**
      * The state of this ViewModel. Observe to get changes or use [getState] to get a snapshot (don't use [LiveData.getValue])
@@ -56,8 +57,16 @@ abstract class BaseViewModel<State, Event>(initialState: State) : ViewModel() {
      */
     val events: Flow<Event> = eventsChannel.asFlow()
 
+    /**
+     * A list of [MiddleWare] that will be called sequentially on every state update
+     */
+    private val middleWares: MutableList<MiddleWare<State>> = mutableListOf()
 
     init {
+        runStateLoop()
+    }
+
+    private fun runStateLoop() {
         // Handle state updates/requests from get and set channels
         viewModelScope.launch {
             while (isActive) {
@@ -67,6 +76,7 @@ abstract class BaseViewModel<State, Event>(initialState: State) : ViewModel() {
                     setStateChannel.onReceive {
                         val newState = currentState.it()
                         if (currentState != newState) {
+                            runMiddleWares(newState)
                             currentState = newState
                             _state.postValue(newState)
                         }
@@ -80,14 +90,26 @@ abstract class BaseViewModel<State, Event>(initialState: State) : ViewModel() {
     }
 
     /**
-     * @param block In this suspending block the current state can be accessed
+     * @param block In this block the current state can be accessed
      */
-    fun getState(block: GetState<State>) {
+    protected fun getState(block: GetState<State>) {
         getStateChannel.offer(block)
     }
 
     /**
-     * @param block Use this suspending block to manipulate the current state by copying and returning it
+     * Adds the given [middleWare] to a list. On every state update the middleWares will be notified
+     * sequentially about the new state and can perform side-effects
+     */
+    fun registerMiddleWare(middleWare: MiddleWare<State>) {
+        middleWares.add(middleWare)
+    }
+
+    private fun runMiddleWares(state: State) {
+        middleWares.forEach { it(state) }
+    }
+
+    /**
+     * @param block Use this block to manipulate the current state by copying and returning it
      */
     protected fun setState(block: SetState<State>) {
         setStateChannel.offer(block)
