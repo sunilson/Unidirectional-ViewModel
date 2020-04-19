@@ -34,8 +34,7 @@ abstract class UniDirectionalSavedStateViewModelReflection<State : Any, Event>(
         val params = this::class
             .memberProperties
             .filter { property ->
-                property.annotations.any { it is Persist } &&
-                        savedStateHandle.get<Any>(property.name) != null
+                property.hasAnnotation<Persist>() && savedStateHandle.get<Any>(property.name) != null
             }
             .associate { property ->
                 copy
@@ -48,9 +47,10 @@ abstract class UniDirectionalSavedStateViewModelReflection<State : Any, Event>(
         return copy.callBy(params) as State
     }
 
+    @ExperimentalStdlibApi
     override fun SavedStateHandle.updateStateHandle(state: State) {
         state::class.memberProperties.forEach { property ->
-            if (property.annotations.any { it is Persist }) {
+            if (property.hasAnnotation<Persist>()) {
                 set(
                     property.name,
                     (property as KProperty1<State, Any>).get(state)
