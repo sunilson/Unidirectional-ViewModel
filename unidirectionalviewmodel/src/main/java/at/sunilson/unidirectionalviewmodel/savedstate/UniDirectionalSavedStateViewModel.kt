@@ -1,6 +1,7 @@
-package at.sunilson.unidirectionalviewmodel
+package at.sunilson.unidirectionalviewmodel.savedstate
 
 import androidx.lifecycle.SavedStateHandle
+import at.sunilson.unidirectionalviewmodel.UniDirectionalViewModel
 
 abstract class UniDirectionalSavedStateViewModel<State : Any, Event>(
     private val initialState: State,

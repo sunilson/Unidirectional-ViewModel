@@ -1,4 +1,4 @@
-package at.sunilson.unidirectionalviewmodel
+package at.sunilson.unidirectionalviewmodel.savedstate
 
 import androidx.lifecycle.SavedStateHandle
 import kotlin.reflect.KProperty1
@@ -6,14 +6,6 @@ import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.instanceParameter
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.memberProperties
-
-@Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.PROPERTY)
-annotation class Persist
-
-@Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.CLASS)
-annotation class PersistableState
 
 abstract class UniDirectionalSavedStateViewModelReflection<State : Any, Event>(
     initialState: State,

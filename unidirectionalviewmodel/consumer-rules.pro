@@ -1,3 +1,3 @@
--keep @at.sunilson.unidirectionalviewmodel.PersistableState public class * { *; }
+-keep @at.sunilson.unidirectionalviewmodel.savedstate.PersistableState public class * { *; }
 -keep class kotlin.Metadata { *; }
 -keepattributes *Annotation*, Signature
