@@ -17,6 +17,14 @@ android {
         consumerProguardFiles 'consumer-rules.pro'
     }
 
+    lintOptions {
+        error("VisibleForTests")
+        abortOnError true
+        checkAllWarnings true
+        warningsAsErrors true
+        lintConfig file("lint.xml")
+    }
+
     buildTypes {
         release {
             minifyEnabled true
