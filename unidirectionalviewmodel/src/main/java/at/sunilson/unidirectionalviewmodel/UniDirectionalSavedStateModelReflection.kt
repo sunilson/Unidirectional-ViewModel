@@ -10,9 +10,10 @@ import kotlin.reflect.full.memberProperties
 @Target(AnnotationTarget.PROPERTY)
 annotation class Persist
 
-/**
- * DON'T USE THIS, no proguard rules have been defined yet
- */
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.CLASS)
+annotation class PersistableState
+
 private fun <State : Any> State.restoreStateHandle(savedStateHandle: SavedStateHandle): State {
     val copy = this::class.memberFunctions.firstOrNull { it.name == "copy" }
     if (copy == null || !this::class.isData) {
