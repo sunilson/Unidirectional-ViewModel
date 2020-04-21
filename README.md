@@ -65,10 +65,8 @@ An Android ViewModel can take in a `SavedStateHandle` which will be kept across 
 When you implement the first one, you will have to implement two methods. `updateStateHandle(state: State)` will be called everytime the state changes. In there you need to save all data you want to persist into the `SavedStateHandle`. The second method is `initializeStateFromSavedState(savedStateHandle: SavedStateHandle)`. This method will be called once in the init block. In this method you need to populate a `State` instance with the values you previously saved into the `SavedStateHandle`.
 
 ```
-override fun State.initializeStateFromSavedState(
-    initialState: State,
-    savedStateHandle: SavedStateHandle
-) = copy(myString = savedStateHandle.get<String>("myString"))
+override fun State.initializeStateFromSavedState(savedStateHandle: SavedStateHandle) =
+    copy(myString = savedStateHandle.get<String>("myString"))
 
 override fun SavedStateHandle.updateStateHandle(state: State) {
     set("myString", state.myString)
