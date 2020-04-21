@@ -15,5 +15,6 @@ abstract class UniDirectionalSavedStateViewModel<State : Any, Event>(
     }
 
     abstract fun State.initializeStateFromSavedState(savedStateHandle: SavedStateHandle): State
+
     abstract fun SavedStateHandle.updateStateHandle(state: State)
 }
