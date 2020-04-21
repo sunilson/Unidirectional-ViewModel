@@ -1,5 +1,7 @@
 # Unidirectional-ViewModel
 
+[![](https://jitpack.io/v/sunilson/Unidirectional-ViewModel.svg)](https://jitpack.io/#sunilson/Unidirectional-ViewModel)
+
 To use the library you just need your ViewModel to extend the `UniDirectionalViewModel` or `UniDirectionalSavedStateViewModel` if you want to use `SavedStateHandle`.
 
 Then you can use `setState` and `getState` in your ViewModel to mutate and/or access the state.
@@ -42,11 +44,14 @@ data class State(val property1: String, @Persist val property2: String, val prop
 
 ## Events
 
-TODO
+When you want to emit an action that is not kept in state, you can do that via `sendEvent(event)`. You can subscribe to those events via the `events` Flow. This flow acts like a Broadcast and will emit every `Event` exactly once. New subscribers don't get the latest event.
 
 ## Middleware 
 
-TODO
+If you want to do something everytime the state changes inside the ViewModel you can add a `MiddleWare` via the `registerMiddleWare(middleWare: MiddleWare<State>)` method. Everytime the state changes, all registered middlewares will be notified about the new state in the order they were added. This way you can for example attach a logger to the state of the ViewModel. Example:
 
-
-[![](https://jitpack.io/v/sunilson/Unidirectional-ViewModel.svg)](https://jitpack.io/#sunilson/Unidirectional-ViewModel)
+```
+registerMiddleWare { state ->
+  Log.d(MY_LOG_TAG, "The state changed: $state"}
+}
+```
