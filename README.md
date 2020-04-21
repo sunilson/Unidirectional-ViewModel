@@ -6,7 +6,7 @@ Then you can use `setState` and `getState` in your ViewModel to mutate and/or ac
 
 ## State
 
-TODO
+When you inherit from `UniDirectionalViewModel` you will need to pass in a generic State type. This can be any class but I would recommend using a `data` class or a `sealed` class containing multiple `data` classes.
 
 ## SetState
 
@@ -25,7 +25,20 @@ A `getState` block just provides you with the current state, but there is one sp
 
 ## SavedStateHandle
 
-TODO
+An Android ViewModel can take in a `SavedStateHandle` which will be kept across process death and be passed in to the ViewModel after the process recreation again. If you want to utilize this feature you need to extend either `UniDirectionalSavedStateViewModel` or `UniDirectionalSavedStateViewModelReflection`. 
+
+When you implement the first one, you will have to implement two methods. `updateStateHandle(state: State)` will be called everytime the state changes. In there you need to save all data you want to persist into the `SavedStateHandle`. The second method is `initializeStateFromSavedState(savedStateHandle: SavedStateHandle)`. This method will be called once in the init block. In this method you need to populate a `State` instance with the values you previously saved into the `SavedStateHandle`.
+
+### Reflection
+
+If you don't want to save your state properties manually you can use the `UniDirectionalSavedStateViewModelReflection`. If you use this class, your State needs to be a data class. Then you need to annotate your state with `@PersistableState` and all properties that should be persisted with `@Persist`. The ViewModel will then automatically save and restore those properties for you. 
+
+```
+//property2 will be persisted over the application process death
+
+@PersistableState
+data class State(val property1: String, @Persist val property2: String, val property3: String)
+```
 
 ## Events
 
