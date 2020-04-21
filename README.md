@@ -58,6 +58,29 @@ class Test : UniDirectionalViewModel<TestState, Events>(TestState()) {
 ## GetState
 A `getState` block just provides you with the current state, but there is one special thing about it. All queued `setState` actions will be executed before any `getState` action is executed to always have the newest state inside a `getState` block. 
 
+## Usage in consumer
+
+To use the ViewModel in your Fragment or Activity you just need to subscribe to the state and/or events of your ViewModel.
+
+```
+override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    //Use LiveData
+    viewModel.state.observe(viewLifecycleOwner, Observer { ... })
+
+    //Or flow extension
+    lifecycleScope.launch {
+        viewModel.stateFlow.collect {... }
+    }
+
+    //Subscribe to one-time events
+    lifecycleScope.launch {
+        viewModel.events.collect { ... }
+    }
+}
+```
+
 ## SavedStateHandle
 
 An Android ViewModel can take in a `SavedStateHandle` which will be kept across process death and be passed in to the ViewModel after the process recreation again. If you want to utilize this feature you need to extend either `UniDirectionalSavedStateViewModel` or `UniDirectionalSavedStateViewModelReflection`. 
