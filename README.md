@@ -48,10 +48,14 @@ When you want to emit an action that is not kept in state, you can do that via `
 
 ## Middleware 
 
-If you want to do something everytime the state changes inside the ViewModel you can add a `MiddleWare` via the `registerMiddleWare(middleWare: MiddleWare<State>)` method. Everytime the state changes, all registered middlewares will be notified about the new state in the order they were added. This way you can for example attach a logger to the state of the ViewModel. Example:
+If you want to do something everytime the state changes inside the ViewModel you can add a `MiddleWare` via the `registerMiddleWare(middleWare: MiddleWare<State>)` method. Everytime the state changes, all registered middlewares will be notified about the new state in the order they were added. This way you can for example attach a logger to the state of the ViewModel. Also, every `MiddleWare` needs to return a `State` object which will be passed to the next `MiddleWare`, so they could do some alteration before the next step is executed. Example:
 
 ```
 registerMiddleWare { state ->
+  //Execute your operations
   Log.d(MY_LOG_TAG, "The state changed: $state"}
+  
+  //Return new or unchanged state
+  state
 }
 ```
