@@ -16,11 +16,44 @@ In a `setState` block you can access the current state and return a new state. Y
 
 ### Sealed class example
 
-TODO
+```
+sealed class TestState {
+    data class Data(val data: List<Any>): TestState()
+    data class Error(val error: String): TestState()
+    object Empty: TestState()
+    object Loading: TestState()
+}
+
+class Test : UniDirectionalViewModel<TestState, Events>(TestState.Empty) {
+    fun loadData() {
+        setState { TestState.Loading }
+        
+        someAsyncWork()
+            .onSuccess { setState { TestState.Data(result) } }
+            .onError { setState { TestState.Error(message) } }
+    }
+}
+```
 
 ### Single data class example
 
-TODO
+```
+data class TestState(
+    val loading: Boolean = false,
+    val data: List<Any> = listOf(),
+    val error: String? = null
+)
+
+class Test : UniDirectionalViewModel<TestState, Events>(TestState()) {
+    fun loadData() {
+        setState { copy(loading = true) }
+
+        someAsyncWork()
+            .onSuccess { setState { copy(loading = false, data = result) } }
+            .onError { setState { copy(loading = false, error = message) } }
+    }
+}
+```
 
 ## GetState
 A `getState` block just provides you with the current state, but there is one special thing about it. All queued `setState` actions will be executed before any `getState` action is executed to always have the newest state inside a `getState` block. 
