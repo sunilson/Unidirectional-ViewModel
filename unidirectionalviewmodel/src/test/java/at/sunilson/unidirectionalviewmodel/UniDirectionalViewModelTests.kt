@@ -1,5 +1,6 @@
 package at.sunilson.unidirectionalviewmodel
 
+import at.sunilson.unidirectionalviewmodel.core.UniDirectionalViewModel
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

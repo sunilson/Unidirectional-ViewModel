@@ -1,7 +1,8 @@
 package at.sunilson.unidirectionalviewmodel.savedstate
 
 import androidx.lifecycle.SavedStateHandle
-import at.sunilson.unidirectionalviewmodel.UniDirectionalViewModel
+import at.sunilson.unidirectionalviewmodel.core.UniDirectionalViewModel
+import at.sunilson.unidirectionalviewmodel.extensions.registerPureMiddleWare
 
 abstract class UniDirectionalSavedStateViewModel<State : Any, Event>(
     private val initialState: State,
@@ -9,8 +10,8 @@ abstract class UniDirectionalSavedStateViewModel<State : Any, Event>(
 ) : UniDirectionalViewModel<State, Event>(initialState) {
 
     init {
+        registerPureMiddleWare { savedStateHandle.updateStateHandle(it) }
         setState { this.initializeStateFromSavedState(savedStateHandle) }
-        registerMiddleWare { savedStateHandle.updateStateHandle(it) }
     }
 
     abstract fun State.initializeStateFromSavedState(savedStateHandle: SavedStateHandle): State

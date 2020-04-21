@@ -1,24 +1,17 @@
-package at.sunilson.unidirectionalviewmodel
+package at.sunilson.unidirectionalviewmodel.core
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
-
-internal typealias GetState<State> = (State) -> Unit
-internal typealias SetState<State> = State.() -> State
-internal typealias MiddleWare<State> = (State) -> Unit
 
 abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) : ViewModel() {
 
@@ -27,19 +20,6 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
      */
     private val _state = MutableLiveData(initialState)
     val state: LiveData<State> get() = _state
-    val stateFlow: Flow<State>
-        get() = channelFlow {
-            val observer = Observer<State> { t -> offer(t) }
-            _state.observeForever(observer)
-            awaitClose { _state.removeObserver(observer) }
-        }
-
-    /**
-     * You probably don't want to use this value is not updated in sync,
-     * only use the state available to you in [setState] or [getState] or subscribe to [state]
-     */
-    var currentState: State = initialState
-        private set
 
     /**
      * Channel used for one-time-events
@@ -74,16 +54,15 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
                 select<Unit> {
                     // Handle setStates first
                     setStateChannel.onReceive {
-                        val newState = currentState.it()
+                        val currentState = state.value!!
+                        val newState = runMiddleWares(currentState.it())
                         if (currentState != newState) {
-                            runMiddleWares(newState)
-                            currentState = newState
-                            _state.postValue(newState)
+                            _state.value = newState
                         }
                     }
 
                     // Handle getStates only after all setStates are done
-                    getStateChannel.onReceive { it(currentState) }
+                    getStateChannel.onReceive { it(state.value!!) }
                 }
             }
         }
@@ -94,18 +73,6 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
      */
     protected fun getState(block: GetState<State>) {
         getStateChannel.offer(block)
-    }
-
-    /**
-     * Adds the given [middleWare] to a list. On every state update the middleWares will be notified
-     * sequentially about the new state and can perform side-effects
-     */
-    fun registerMiddleWare(middleWare: MiddleWare<State>) {
-        middleWares.add(middleWare)
-    }
-
-    private fun runMiddleWares(state: State) {
-        middleWares.forEach { it(state) }
     }
 
     /**
@@ -120,5 +87,19 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
      */
     protected fun sendEvent(event: Event) {
         eventsChannel.offer(event)
+    }
+
+    fun registerMiddleWare(middleWare: MiddleWare<State>) = middleWares.add(middleWare)
+
+    fun registerMiddleWares(builder: MiddleWareBuilder.() -> Unit) =
+        MiddleWareBuilder().apply(builder)
+
+    private fun runMiddleWares(state: State) =
+        middleWares.fold(state, { acc, middleWare -> middleWare(acc) })
+
+    inner class MiddleWareBuilder {
+        fun middleWare(block: MiddleWare<State>) {
+            middleWares.add(block)
+        }
     }
 }
