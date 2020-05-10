@@ -1,30 +1,31 @@
 package at.sunilson.unidirectionalviewmodel.core
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
 
+@ExperimentalCoroutinesApi
 abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) : ViewModel() {
 
     /**
-     * The state of this ViewModel. Observe to get changes or use [getState] to get a snapshot (don't use [LiveData.getValue])
+     * The state of this ViewModel. Observe to get changes or use [getState] to get a snapshot
      */
-    private val _state = MutableLiveData(initialState)
-    val state: LiveData<State> get() = _state
+    private val _state = MutableStateFlow(initialState)
+    val state: StateFlow<State> get() = _state
 
     /**
      * Channel used for one-time-events
      */
-    private val eventsChannel = BroadcastChannel<Event>(BUFFERED)
+    private val eventsChannel = BroadcastChannel<Event>(1)
 
     /**
      * Channel used to queue all actions so they are execute sequentially
@@ -53,16 +54,10 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
                 // This allows us to recieve on multiple channels. First one has priority if not empty
                 select<Unit> {
                     // Handle setStates first
-                    setStateChannel.onReceive {
-                        val currentState = state.value!!
-                        val newState = runMiddleWares(currentState.it())
-                        if (currentState != newState) {
-                            _state.value = newState
-                        }
-                    }
+                    setStateChannel.onReceive { _state.value = runMiddleWares(state.value.it()) }
 
                     // Handle getStates only after all setStates are done
-                    getStateChannel.onReceive { it(state.value!!) }
+                    getStateChannel.onReceive { it(state.value) }
                 }
             }
         }
@@ -91,15 +86,20 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
 
     fun registerMiddleWare(middleWare: MiddleWare<State>) = middleWares.add(middleWare)
 
-    fun registerMiddleWares(builder: MiddleWareBuilder.() -> Unit) =
-        MiddleWareBuilder().apply(builder)
+    fun registerMiddleWares(builder: MiddleWareBuilder.() -> Unit) {
+        middleWares.addAll(MiddleWareBuilder().apply(builder).build())
+    }
 
     private fun runMiddleWares(state: State) =
         middleWares.fold(state, { acc, middleWare -> middleWare(acc) })
 
     inner class MiddleWareBuilder {
+        private val middleWares = mutableListOf<MiddleWare<State>>()
+
         fun middleWare(block: MiddleWare<State>) {
             middleWares.add(block)
         }
+
+        internal fun build() = middleWares
     }
 }
