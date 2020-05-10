@@ -86,15 +86,20 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
 
     fun registerMiddleWare(middleWare: MiddleWare<State>) = middleWares.add(middleWare)
 
-    fun registerMiddleWares(builder: MiddleWareBuilder.() -> Unit) =
-        MiddleWareBuilder().apply(builder)
+    fun registerMiddleWares(builder: MiddleWareBuilder.() -> Unit) {
+        middleWares.addAll(MiddleWareBuilder().apply(builder).build())
+    }
 
     private fun runMiddleWares(state: State) =
         middleWares.fold(state, { acc, middleWare -> middleWare(acc) })
 
     inner class MiddleWareBuilder {
+        private val middleWares = mutableListOf<MiddleWare<State>>()
+
         fun middleWare(block: MiddleWare<State>) {
             middleWares.add(block)
         }
+
+        internal fun build() = middleWares
     }
 }
