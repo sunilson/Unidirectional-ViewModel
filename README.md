@@ -49,7 +49,7 @@ class Test : UniDirectionalViewModel<TestState, Events>(TestState()) {
         setState { copy(loading = true) }
 
         someAsyncWork()
-            .onSuccess { setState { copy(loading = false, data = result) } }
+            .onSuccess { setState { copy(loading = false, data = result, error = null) } }
             .onError { setState { copy(loading = false, error = message) } }
     }
 }
