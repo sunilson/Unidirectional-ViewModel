@@ -108,6 +108,12 @@ data class State(val property1: String, @Persist val property2: String, val prop
 
 When you want to emit an action that is not kept in state, you can do that via `sendEvent(event)`. You can subscribe to those events via the `events` Flow. This flow acts like a Broadcast and will emit every `Event` exactly once. New subscribers don't get the latest event.
 
+```
+            someAsyncWork()
+                .onSuccess { result -> setState { TestState.Data(result) } }
+                .onError { error -> sendEvent(NetworkErrorHappened(error)) }
+```
+
 ## Middleware 
 
 If you want to do something everytime the state changes inside the ViewModel you can add a `MiddleWare` via the `registerMiddleWare(middleWare: MiddleWare<State>)` method. Everytime the state changes, all registered middlewares will be notified about the new state in the order they were added. This way you can for example attach a logger to the state of the ViewModel. Also, every `MiddleWare` needs to return a `State` object which will be passed to the next `MiddleWare`, so they could do some alteration before the next step is executed. Example:
