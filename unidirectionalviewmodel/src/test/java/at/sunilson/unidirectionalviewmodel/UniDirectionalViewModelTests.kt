@@ -10,9 +10,7 @@ class UniDirectionalViewModelTests {
 
     private data class State(val string: String)
     private sealed class Events
-    private class TestViewModel : UniDirectionalViewModel<State, Events>(State("")) {
-
-    }
+    private class TestViewModel : UniDirectionalViewModel<State, Events>(State(""))
 
     private lateinit var viewModel: TestViewModel
 
@@ -45,5 +43,4 @@ class UniDirectionalViewModelTests {
     fun `All middlewares are executed and in correct order`() {
         TODO()
     }
-
 }
