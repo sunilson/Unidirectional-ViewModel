@@ -109,9 +109,9 @@ data class State(val property1: String, @Persist val property2: String, val prop
 When you want to emit an action that is not kept in state, you can do that via `sendEvent(event)`. You can subscribe to those events via the `events` Flow. This flow acts like a Broadcast and will emit every `Event` exactly once. New subscribers don't get the latest event.
 
 ```
-            someAsyncWork()
-                .onSuccess { result -> setState { TestState.Data(result) } }
-                .onError { error -> sendEvent(NetworkErrorHappened(error)) }
+someAsyncWork()
+    .onSuccess { result -> setState { TestState.Data(result) } }
+    .onError { error -> sendEvent(NetworkErrorHappened(error)) }
 ```
 
 ## Middleware 
