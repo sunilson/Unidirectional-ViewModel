@@ -66,12 +66,9 @@ To use the ViewModel in your Fragment or Activity you just need to subscribe to 
 override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    //Use LiveData
-    viewModel.state.observe(viewLifecycleOwner, Observer { ... })
-
-    //Or flow extension
+    //Subscribe to state
     lifecycleScope.launch {
-        viewModel.stateFlow.collect {... }
+        viewModel.state.collect {... }
     }
 
     //Subscribe to one-time events
