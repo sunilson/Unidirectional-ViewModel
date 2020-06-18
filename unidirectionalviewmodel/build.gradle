@@ -2,9 +2,33 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "org.jlleitschuh.gradle.ktlint"
-apply plugin: 'com.github.dcendents.android-maven'
 
-group='com.github.sunilson'
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                // Applies the component for the release build variant.
+                from components.release
+
+                // You can then customize attributes of the publication as shown below.
+                groupId = 'com.github.sunilson'
+                artifactId = 'final'
+                version = '1.0'
+            }
+
+            debug(MavenPublication) {
+                // Applies the component for the release build variant.
+                from components.debug
+
+                // You can then customize attributes of the publication as shown below.
+                groupId = 'com.github.sunilson'
+                artifactId = 'final'
+                version = '1.0'
+            }
+        }
+    }
+}
 
 android {
     compileSdkVersion 29
@@ -31,7 +55,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
