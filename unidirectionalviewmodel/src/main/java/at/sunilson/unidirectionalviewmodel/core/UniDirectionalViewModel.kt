@@ -36,7 +36,8 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
     /**
      * Flow that emits one-time-events emitted by the ViewModel
      */
-    val events: Flow<Event> = eventsChannel.asFlow()
+    val events: Flow<Event>
+        get() = eventsChannel.asFlow()
 
     /**
      * A list of [MiddleWare] that will be called sequentially on every state update
