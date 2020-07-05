@@ -95,7 +95,7 @@ override fun SavedStateHandle.updateStateHandle(state: State) {
 
 ### Reflection
 
-If you don't want to save your state properties manually you can use the `UniDirectionalSavedStateViewModelReflection`. If you use this class, your State needs to be a data class. Then you need to annotate your state with `@PersistableState` and all properties that should be persisted with `@Persist`. The ViewModel will then automatically save and restore those properties for you. 
+If you don't want to save your state properties manually you can use the `UniDirectionalSavedStateViewModelReflection`. If you use this class, your State needs to be a data class. Then you need to annotate your state with `@PersistableState` and all properties that should be persisted with `@Persist`. All models annoted with `@Persist` need to be serializable so that they can be saved into the SavedStateHandle. The ViewModel will then automatically save and restore those properties for you. 
 
 ```
 //property2 will be persisted over the application process death
