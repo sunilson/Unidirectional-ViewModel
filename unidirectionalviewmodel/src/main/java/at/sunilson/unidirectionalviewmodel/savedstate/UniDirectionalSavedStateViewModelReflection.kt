@@ -53,7 +53,7 @@ abstract class UniDirectionalSavedStateViewModelReflection<State : Any, Event>(
 
     private fun assertDataClass(state: State) {
         try {
-            check(this::class.isData)
+            check(state::class.isData)
         } catch (error: Exception) {
             error("The state must be a data class!")
         }

@@ -11,7 +11,9 @@ abstract class UniDirectionalSavedStateViewModel<State : Any, Event>(
 
     init {
         registerPureMiddleWare { savedStateHandle.updateStateHandle(it) }
-        setState { this.initializeStateFromSavedState(savedStateHandle) }
+
+        val restoredState = initialState.initializeStateFromSavedState(savedStateHandle)
+        setState { restoredState }
     }
 
     abstract fun State.initializeStateFromSavedState(savedStateHandle: SavedStateHandle): State
