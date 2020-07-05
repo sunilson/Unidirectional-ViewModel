@@ -1,8 +1,6 @@
 # Unidirectional-ViewModel
 
-[![](https://jitpack.io/v/sunilson/Unidirectional-ViewModel.svg)](https://jitpack.io/#sunilson/Unidirectional-ViewModel)
-
-[![Build Status](https://app.bitrise.io/app/d330cca1d73b2529/status.svg?token=_h2-2cCWJTkwcL1BpHAnRQ)](https://app.bitrise.io/app/d330cca1d73b2529)
+[![](https://jitpack.io/v/sunilson/Unidirectional-ViewModel.svg)](https://jitpack.io/#sunilson/Unidirectional-ViewModel) [![Build Status](https://app.bitrise.io/app/d330cca1d73b2529/status.svg?token=_h2-2cCWJTkwcL1BpHAnRQ)](https://app.bitrise.io/app/d330cca1d73b2529) [![codecov](https://codecov.io/gh/sunilson/Unidirectional-ViewModel/branch/master/graph/badge.svg)](https://codecov.io/gh/sunilson/Unidirectional-ViewModel)
 
 To use the library you just need your ViewModel to extend the `UniDirectionalViewModel` or `UniDirectionalSavedStateViewModel` if you want to use `SavedStateHandle`.
 
