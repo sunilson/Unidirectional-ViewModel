@@ -1,12 +1,12 @@
 package at.sunilson.unidirectionalviewmodel
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
 import at.sunilson.unidirectionalviewmodel.savedstate.Persist
 import at.sunilson.unidirectionalviewmodel.savedstate.PersistableState
 import at.sunilson.unidirectionalviewmodel.savedstate.UniDirectionalSavedStateViewModelReflection
 import io.mockk.every
 import io.mockk.mockk
+import java.io.Serializable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
-import java.io.Serializable
 
 @ExtendWith(TestCoroutineDispatcherExtension::class)
 class UniDirectionalViewModelReflectionTests {

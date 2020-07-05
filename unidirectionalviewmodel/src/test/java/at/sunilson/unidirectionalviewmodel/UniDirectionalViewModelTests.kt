@@ -20,7 +20,6 @@ class UniDirectionalViewModelTests {
         object Event2 : Events()
     }
 
-
     @Test
     fun `Events are recieved`() = runBlockingTest {
         class TestViewModel : UniDirectionalViewModel<State, Events>(State("")) {
@@ -164,7 +163,6 @@ class UniDirectionalViewModelTests {
         val middleWare: MiddleWare<State> = {
             it.copy(string = it.string.toLowerCase())
         }
-
 
         class TestViewModel : UniDirectionalViewModel<State, Events>(State("")) {
             init {
