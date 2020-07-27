@@ -69,12 +69,12 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
     //Subscribe to state
-    lifecycleScope.launch {
+    viewLifecycleOwner.lifecycleScope.launch {
         viewModel.state.collect {... }
     }
 
     //Subscribe to one-time events
-    lifecycleScope.launch {
+    viewLifecycleOwner.lifecycleScope.launch {
         viewModel.events.collect { ... }
     }
 }
