@@ -1,8 +1,6 @@
 # Unidirectional-ViewModel
 
-[![](https://jitpack.io/v/sunilson/Unidirectional-ViewModel.svg)](https://jitpack.io/#sunilson/Unidirectional-ViewModel)
-
-[![Build Status](https://app.bitrise.io/app/d330cca1d73b2529/status.svg?token=_h2-2cCWJTkwcL1BpHAnRQ)](https://app.bitrise.io/app/d330cca1d73b2529)
+[![](https://jitpack.io/v/sunilson/Unidirectional-ViewModel.svg)](https://jitpack.io/#sunilson/Unidirectional-ViewModel) [![Build Status](https://app.bitrise.io/app/d330cca1d73b2529/status.svg?token=_h2-2cCWJTkwcL1BpHAnRQ)](https://app.bitrise.io/app/d330cca1d73b2529) [![codecov](https://codecov.io/gh/sunilson/Unidirectional-ViewModel/branch/master/graph/badge.svg)](https://codecov.io/gh/sunilson/Unidirectional-ViewModel)
 
 To use the library you just need your ViewModel to extend the `UniDirectionalViewModel` or `UniDirectionalSavedStateViewModel` if you want to use `SavedStateHandle`.
 
@@ -99,7 +97,7 @@ override fun SavedStateHandle.updateStateHandle(state: State) {
 
 ### Reflection
 
-If you don't want to save your state properties manually you can use the `UniDirectionalSavedStateViewModelReflection`. If you use this class, your State needs to be a data class. Then you need to annotate your state with `@PersistableState` and all properties that should be persisted with `@Persist`. The ViewModel will then automatically save and restore those properties for you. 
+If you don't want to save your state properties manually you can use the `UniDirectionalSavedStateViewModelReflection`. If you use this class, your State needs to be a data class. Then you need to annotate your state with `@PersistableState` and all properties that should be persisted with `@Persist`. All models annoted with `@Persist` need to be serializable so that they can be saved into the SavedStateHandle. The ViewModel will then automatically save and restore those properties for you. 
 
 ```
 //property2 will be persisted over the application process death
