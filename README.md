@@ -12,6 +12,8 @@ Then you can use `setState` and `getState` in your ViewModel to mutate and/or ac
 
 When you inherit from `UniDirectionalViewModel` you will need to pass in a generic State type. This can be any class but I would recommend using a `data` class or a `sealed` class containing multiple `data` classes.
 
+The state Flow should only emit if the state really changes to improve performance. The default implementation is just `oldState == newState` but you can also override `stateDiff(oldState, newState)` to provide a custom implementation.
+
 ## SetState
 
 In a `setState` block you can access the current state and return a new state. You have multiple options how to structure your state.

@@ -7,8 +7,8 @@ import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
@@ -20,7 +20,8 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
      * The state of this ViewModel. Observe to get changes or use [getState] to get a snapshot
      */
     private val _state = MutableStateFlow(initialState)
-    val state: StateFlow<State> get() = _state
+    val state: Flow<State>
+        get() = _state.distinctUntilChanged { old, new -> stateDiff(old, new) }
 
     /**
      * Channel used for one-time-events
@@ -55,13 +56,17 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
                 // This allows us to recieve on multiple channels. First one has priority if not empty
                 select<Unit> {
                     // Handle setStates first
-                    setStateChannel.onReceive { _state.value = runMiddleWares(state.value.it()) }
+                    setStateChannel.onReceive { _state.value = runMiddleWares(_state.value.it()) }
 
                     // Handle getStates only after all setStates are done
-                    getStateChannel.onReceive { it(state.value) }
+                    getStateChannel.onReceive { it(_state.value) }
                 }
             }
         }
+    }
+
+    protected open fun stateDiff(oldState: State, newState: State): Boolean {
+        return oldState == newState
     }
 
     /**
