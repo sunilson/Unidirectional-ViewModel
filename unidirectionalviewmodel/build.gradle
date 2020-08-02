@@ -4,6 +4,12 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: "org.jlleitschuh.gradle.ktlint"
 apply plugin: "de.mannodermaus.android-junit5"
 apply plugin: "jacoco"
+apply plugin: 'maven-publish'
+
+task sourceJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier "sources"
+}
 
 afterEvaluate {
     publishing {
@@ -14,18 +20,10 @@ afterEvaluate {
 
                 // You can then customize attributes of the publication as shown below.
                 groupId = 'com.github.sunilson'
-                artifactId = 'final'
-                version = '0.4'
-            }
+                version = '0.7'
 
-            debug(MavenPublication) {
-                // Applies the component for the release build variant.
-                from components.debug
-
-                // You can then customize attributes of the publication as shown below.
-                groupId = 'com.github.sunilson'
-                artifactId = 'final'
-                version = '0.4'
+                // Adds javadocs and sources as separate jars.
+                artifact sourceJar
             }
         }
     }
@@ -38,8 +36,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 3
-        versionName "0.6"
+        versionCode 4
+        versionName "0.7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
