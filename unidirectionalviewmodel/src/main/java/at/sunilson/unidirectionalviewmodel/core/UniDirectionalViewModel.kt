@@ -25,6 +25,8 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
 
     /**
      * Channel used for one-time-events
+     *
+     * TODO: Replace with SharedFlow (https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-shared-flow/
      */
     private val eventsChannel = BroadcastChannel<Event>(1)
 
@@ -65,18 +67,28 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
         }
     }
 
+    /**
+     * Override this method to have control over when a new state is different to the old one. Only
+     * when this returns true will a new state be emitted. Default implementation: `oldState == newState`
+     */
     protected open fun stateDiff(oldState: State, newState: State): Boolean {
         return oldState == newState
     }
 
     /**
+     * Use this method to safely access the state. All [setState] calls that are queued will be
+     * executed before this [block]
+     *
      * @param block In this block the current state can be accessed
      */
-    protected fun getState(block: GetState<State>) {
+    fun getState(block: GetState<State>) {
         getStateChannel.offer(block)
     }
 
     /**
+     * Use this method to update the state of the ViewModel. All [setState] blocks will be queued
+     * and executed before any [getState] block will be executed.
+     *
      * @param block Use this block to manipulate the current state by copying and returning it
      */
     protected fun setState(block: SetState<State>) {
@@ -90,8 +102,15 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
         eventsChannel.offer(event)
     }
 
+    /**
+     * Use this method to add a [MiddleWare] to this ViewModel. All [MiddleWare] will be called when
+     * the state changes, in the order of their addition.
+     */
     fun registerMiddleWare(middleWare: MiddleWare<State>) = middleWares.add(middleWare)
 
+    /**
+     * Builder method to add multiple [MiddleWare] at once
+     */
     fun registerMiddleWares(builder: MiddleWareBuilder.() -> Unit) {
         middleWares.addAll(MiddleWareBuilder().apply(builder).build())
     }
