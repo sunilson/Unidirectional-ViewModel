@@ -25,13 +25,14 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
         get() = _state.distinctUntilChanged { old, new -> stateDiff(old, new) }
 
     /**
-     * Channel used for one-time-events
+     * Flow used for one-time events.
      */
-    private val eventsChannel = MutableSharedFlow<Event>(
+    private val _events = MutableSharedFlow<Event>(
         replay = 0,
-        extraBufferCapacity = 1,
+        extraBufferCapacity = Channel.UNLIMITED,
         onBufferOverflow = BufferOverflow.DROP_LATEST
     )
+    val events: Flow<Event> = _events.asSharedFlow()
 
     /**
      * Channel used to queue all actions so they are execute sequentially
@@ -39,11 +40,7 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
     private val setStateChannel = Channel<SetState<State>>(Channel.UNLIMITED)
     private val getStateChannel = Channel<GetState<State>>(Channel.UNLIMITED)
 
-    /**
-     * Flow that emits one-time-events emitted by the ViewModel
-     */
-    val events: Flow<Event>
-        get() = eventsChannel.asSharedFlow()
+
 
     /**
      * A list of [MiddleWare] that will be called sequentially on every state update
@@ -102,7 +99,7 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
      * Emits a one-time [Event] to all subscribers of the [event] flow
      */
     protected fun sendEvent(event: Event) {
-        eventsChannel.tryEmit(event)
+        _events.tryEmit(event)
     }
 
     /**
