@@ -20,7 +20,7 @@ afterEvaluate {
 
                 // You can then customize attributes of the publication as shown below.
                 groupId = 'com.github.sunilson'
-                version = '0.7'
+                version = '0.74'
 
                 // Adds javadocs and sources as separate jars.
                 artifact sourceJar
