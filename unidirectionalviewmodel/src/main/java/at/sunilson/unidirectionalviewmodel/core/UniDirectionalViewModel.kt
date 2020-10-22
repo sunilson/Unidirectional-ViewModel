@@ -3,11 +3,12 @@ package at.sunilson.unidirectionalviewmodel.core
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.BroadcastChannel
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -25,10 +26,12 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
 
     /**
      * Channel used for one-time-events
-     *
-     * TODO: Replace with SharedFlow (https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-shared-flow/
      */
-    private val eventsChannel = BroadcastChannel<Event>(1)
+    private val eventsChannel = MutableSharedFlow<Event>(
+        replay = 0,
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_LATEST
+    )
 
     /**
      * Channel used to queue all actions so they are execute sequentially
@@ -40,7 +43,7 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
      * Flow that emits one-time-events emitted by the ViewModel
      */
     val events: Flow<Event>
-        get() = eventsChannel.asFlow()
+        get() = eventsChannel.asSharedFlow()
 
     /**
      * A list of [MiddleWare] that will be called sequentially on every state update
@@ -99,7 +102,7 @@ abstract class UniDirectionalViewModel<State : Any, Event>(initialState: State) 
      * Emits a one-time [Event] to all subscribers of the [event] flow
      */
     protected fun sendEvent(event: Event) {
-        eventsChannel.offer(event)
+        eventsChannel.tryEmit(event)
     }
 
     /**
